@@ -175,6 +175,20 @@ module Delayed
           reset
           super
         end
+        
+        def destroy
+          retries = 0
+          begin
+            super
+          rescue ::ActiveRecord::StatementInvalid => e
+            if retries < 10
+              retries +=1
+              retry
+            else
+              raise
+            end
+          end
+        end
       end
     end
   end
